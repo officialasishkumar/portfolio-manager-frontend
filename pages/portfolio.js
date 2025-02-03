@@ -4,11 +4,9 @@ import {
     Container,
     Typography,
     Box,
-    List,
-    ListItem,
-    ListItemText,
-    Paper,
     Grid,
+    Paper,
+    CircularProgress,
 } from "@mui/material";
 import NavBar from "../components/NavBar";
 import api from "../services/api";
@@ -16,6 +14,7 @@ import api from "../services/api";
 export default function Portfolio() {
     const router = useRouter();
     const [portfolio, setPortfolio] = useState([]);
+    const [loading, setLoading] = useState(true); // <-- Loader state
 
     const fetchPortfolio = async () => {
         try {
@@ -27,6 +26,8 @@ export default function Portfolio() {
             } else {
                 alert("Error fetching portfolio");
             }
+        } finally {
+            setLoading(false); // Stop loader whether success or error
         }
     };
 
@@ -69,48 +70,63 @@ export default function Portfolio() {
                         </Typography>
                     </Paper>
 
-                    {/* Portfolio Holdings */}
-                    <Grid container spacing={3}>
-                        {portfolio.length === 0 ? (
-                            <Grid item xs={12}>
-                                <Paper
-                                    elevation={4}
-                                    sx={{
-                                        p: 3,
-                                        textAlign: "center",
-                                        borderRadius: 3,
-                                        backgroundColor: "rgba(255, 255, 255, 0.95)",
-                                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                                    }}
-                                >
-                                    <Typography variant="h6" color="textSecondary">
-                                        No executed orders to display.
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                        ) : (
-                            portfolio.map((item, index) => (
-                                <Grid item xs={12} md={6} key={index}>
+                    {/* Loader or Portfolio Holdings */}
+                    {loading ? (
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                mt: 4,
+                            }}
+                        >
+                            <CircularProgress />
+                        </Box>
+                    ) : (
+                        <Grid container spacing={3}>
+                            {portfolio.length === 0 ? (
+                                <Grid item xs={12}>
                                     <Paper
                                         elevation={4}
                                         sx={{
                                             p: 3,
+                                            textAlign: "center",
                                             borderRadius: 3,
-                                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                                             backgroundColor: "rgba(255, 255, 255, 0.95)",
+                                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                                         }}
                                     >
-                                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
-                                            {item.security}
-                                        </Typography>
-                                        <Typography sx={{ fontSize: "1.1rem" }}>
-                                            <strong>Quantity:</strong> {item.qty}
+                                        <Typography variant="h6" color="textSecondary">
+                                            No executed orders to display.
                                         </Typography>
                                     </Paper>
                                 </Grid>
-                            ))
-                        )}
-                    </Grid>
+                            ) : (
+                                portfolio.map((item, index) => (
+                                    <Grid item xs={12} md={6} key={index}>
+                                        <Paper
+                                            elevation={4}
+                                            sx={{
+                                                p: 3,
+                                                borderRadius: 3,
+                                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="h6"
+                                                sx={{ fontWeight: "bold", mb: 1 }}
+                                            >
+                                                {item.security}
+                                            </Typography>
+                                            <Typography sx={{ fontSize: "1.1rem" }}>
+                                                <strong>Quantity:</strong> {item.qty}
+                                            </Typography>
+                                        </Paper>
+                                    </Grid>
+                                ))
+                            )}
+                        </Grid>
+                    )}
                 </Container>
             </Box>
         </>
