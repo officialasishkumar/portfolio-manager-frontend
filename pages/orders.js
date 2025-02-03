@@ -23,7 +23,7 @@ export default function Orders() {
     const [orders, setOrders] = useState([]);
     const [security, setSecurity] = useState("");
     const [qty, setQty] = useState("");
-    const [loading, setLoading] = useState(true); // <-- Loader state
+    const [loading, setLoading] = useState(true);
 
     // State for editing an order (only quantity can be changed)
     const [editingOrderId, setEditingOrderId] = useState(null);
@@ -44,7 +44,7 @@ export default function Orders() {
                 alert("Error fetching orders");
             }
         } finally {
-            setLoading(false); // Stop loader
+            setLoading(false);
         }
     };
 
@@ -119,6 +119,18 @@ export default function Orders() {
         else if (status === "partial") color = "info";
         else if (status === "cancelled") color = "error";
         return <Chip label={status.toUpperCase()} color={color} />;
+    };
+
+    // A common style for the order card containers to ensure consistent height.
+    const orderCardSx = {
+        p: 3,
+        borderRadius: 3,
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        minHeight: "280px", // Adjust as needed
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
     };
 
     return (
@@ -216,15 +228,7 @@ export default function Orders() {
                             ) : (
                                 orders.map((order) => (
                                     <Grid item xs={12} md={6} key={order.id}>
-                                        <Paper
-                                            elevation={4}
-                                            sx={{
-                                                p: 3,
-                                                borderRadius: 3,
-                                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                                                backgroundColor: "rgba(255, 255, 255, 0.95)",
-                                            }}
-                                        >
+                                        <Paper sx={orderCardSx}>
                                             {editingOrderId === order.id ? (
                                                 // Inline edit form for amending the order quantity.
                                                 <Box
@@ -233,6 +237,7 @@ export default function Orders() {
                                                         e.preventDefault();
                                                         handleUpdateOrder(order.id);
                                                     }}
+                                                    sx={{ flexGrow: 1 }}
                                                 >
                                                     <Typography
                                                         variant="h6"
@@ -249,31 +254,10 @@ export default function Orders() {
                                                         fullWidth
                                                         sx={{ mb: 2 }}
                                                     />
-                                                    <Box sx={{ display: "flex", gap: 2 }}>
-                                                        <Button
-                                                            type="submit"
-                                                            variant="contained"
-                                                            color="primary"
-                                                            sx={{ flex: 1 }}
-                                                        >
-                                                            Save
-                                                        </Button>
-                                                        <Button
-                                                            variant="outlined"
-                                                            color="secondary"
-                                                            sx={{ flex: 1 }}
-                                                            onClick={() => {
-                                                                setEditingOrderId(null);
-                                                                setEditingQty("");
-                                                            }}
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                    </Box>
                                                 </Box>
                                             ) : (
-                                                // Display order details with action buttons.
-                                                <Box>
+                                                // Display order details.
+                                                <Box sx={{ flexGrow: 1 }}>
                                                     <Typography
                                                         variant="h6"
                                                         sx={{ fontWeight: "bold", mb: 1 }}
@@ -291,14 +275,43 @@ export default function Orders() {
                                                         <strong>Pending Qty:</strong>{" "}
                                                         {order.original_qty - order.executed_qty}
                                                     </Typography>
-                                                    <Box
-                                                        sx={{
-                                                            mt: 2,
-                                                            display: "flex",
-                                                            gap: 2,
-                                                            flexWrap: "wrap",
-                                                        }}
-                                                    >
+                                                </Box>
+                                            )}
+
+                                            {/* Action Buttons */}
+                                            <Box
+                                                sx={{
+                                                    mt: 2,
+                                                    display: "flex",
+                                                    gap: 2,
+                                                    flexWrap: "wrap",
+                                                }}
+                                            >
+                                                {editingOrderId === order.id ? (
+                                                    <>
+                                                        <Button
+                                                            type="submit"
+                                                            variant="contained"
+                                                            color="primary"
+                                                            onClick={() => handleUpdateOrder(order.id)}
+                                                            sx={{ flex: 1 }}
+                                                        >
+                                                            Save
+                                                        </Button>
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="secondary"
+                                                            onClick={() => {
+                                                                setEditingOrderId(null);
+                                                                setEditingQty("");
+                                                            }}
+                                                            sx={{ flex: 1 }}
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                    </>
+                                                ) : (
+                                                    <>
                                                         {order.status !== "executed" &&
                                                             order.status !== "cancelled" && (
                                                                 <>
@@ -330,9 +343,9 @@ export default function Orders() {
                                                                     </Button>
                                                                 </>
                                                             )}
-                                                    </Box>
-                                                </Box>
-                                            )}
+                                                    </>
+                                                )}
+                                            </Box>
                                         </Paper>
                                     </Grid>
                                 ))
