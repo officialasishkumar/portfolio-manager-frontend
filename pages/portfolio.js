@@ -6,7 +6,9 @@ import {
     Box,
     List,
     ListItem,
-    ListItemText
+    ListItemText,
+    Paper,
+    Grid,
 } from "@mui/material";
 import NavBar from "../components/NavBar";
 import api from "../services/api";
@@ -35,24 +37,82 @@ export default function Portfolio() {
     return (
         <>
             <NavBar />
-            <Container maxWidth="md" sx={{ mt: 4 }}>
-                <Typography variant="h4" gutterBottom>
-                    Portfolio
-                </Typography>
-                {portfolio.length === 0 ? (
-                    <Typography>No executed orders to display.</Typography>
-                ) : (
-                    <Box>
-                        <List>
-                            {portfolio.map((item, index) => (
-                                <ListItem key={index}>
-                                    <ListItemText primary={item.security} secondary={`Qty: ${item.qty}`} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Box>
-                )}
-            </Container>
+            <Box
+                sx={{
+                    minHeight: "calc(100vh - 64px)",
+                    backgroundImage: 'url("/images/login-bg.jpg")',
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    py: 4,
+                    display: "flex",
+                    justifyContent: "center",
+                }}
+            >
+                <Container maxWidth="md">
+                    {/* Portfolio Title Section */}
+                    <Paper
+                        elevation={6}
+                        sx={{
+                            p: 4,
+                            mb: 4,
+                            backgroundColor: "rgba(255, 255, 255, 0.9)",
+                            borderRadius: 3,
+                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                            textAlign: "center",
+                        }}
+                    >
+                        <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+                            Portfolio
+                        </Typography>
+                        <Typography variant="subtitle1" color="textSecondary">
+                            Your executed orders and holdings
+                        </Typography>
+                    </Paper>
+
+                    {/* Portfolio Holdings */}
+                    <Grid container spacing={3}>
+                        {portfolio.length === 0 ? (
+                            <Grid item xs={12}>
+                                <Paper
+                                    elevation={4}
+                                    sx={{
+                                        p: 3,
+                                        textAlign: "center",
+                                        borderRadius: 3,
+                                        backgroundColor: "rgba(255, 255, 255, 0.95)",
+                                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                    }}
+                                >
+                                    <Typography variant="h6" color="textSecondary">
+                                        No executed orders to display.
+                                    </Typography>
+                                </Paper>
+                            </Grid>
+                        ) : (
+                            portfolio.map((item, index) => (
+                                <Grid item xs={12} md={6} key={index}>
+                                    <Paper
+                                        elevation={4}
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 3,
+                                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                                            backgroundColor: "rgba(255, 255, 255, 0.95)",
+                                        }}
+                                    >
+                                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+                                            {item.security}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: "1.1rem" }}>
+                                            <strong>Quantity:</strong> {item.qty}
+                                        </Typography>
+                                    </Paper>
+                                </Grid>
+                            ))
+                        )}
+                    </Grid>
+                </Container>
+            </Box>
         </>
     );
 }
